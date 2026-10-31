@@ -1,54 +1,78 @@
-function ChatTab({ log = [] }) {
+import { useState } from "react";
+
+function ChatTab({ report = {}, investigation = {}, messageLog = [] }) {
+  const [question, setQuestion] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      text: "Hello! I can help you understand the current network diagnosis. Ask me about the report, evidence, or investigation.",
+    },
+  ]);
+
+  function handleSend(event) {
+    event.preventDefault();
+
+    const text = question.trim();
+    if (!text) return;
+
+    const answer = `Current diagnosis status: ${
+      report.status || "Not available"
+    }. Investigation mode: ${
+      investigation.mode || "Not available"
+    }. For a detailed explanation, review the Diagnosis and Evidence tabs.`;
+
+    setMessages((previous) => [
+      ...previous,
+      { role: "user", text },
+      { role: "assistant", text: answer },
+    ]);
+
+    setQuestion("");
+  }
+
   return (
-    <div className="fade-in tab-panel">
-      <p className="text-muted mb-4">
-        Showing {log.length} structured messages exchanged between agents.
-      </p>
-      <div className="chat-log">
-        {log.map((m, i) => {
-          const isError = m.msg_type === "ERROR";
-          const isResult = m.msg_type === "RESULT";
-          return (
-            <div
-              key={i}
-              className={`chat-msg ${isError ? "error" : isResult ? "result" : ""}`}
-            >
-              <div className="chat-header">
-                <span className="sender">{m.sender}</span>
-                <span className="arrow">➔</span>
-                <span className="recipient">{m.recipient}</span>
-                <span className="type-badge">{m.msg_type}</span>
-              </div>
-              <div className="chat-body">
-                {m.payload?.anomalies?.length > 0 && (
-                  <div className="chat-data">
-                    Anomalies Detected:{" "}
-                    <span className="code">
-                      {m.payload.anomalies.join(", ")}
-                    </span>
-                  </div>
-                )}
-                {m.payload?.error && (
-                  <div className="chat-data text-red">
-                    Data Error: {m.payload.error}
-                  </div>
-                )}
-                {m.payload?.suspected_root_cause && (
-                  <div className="chat-data text-green">
-                    Final Conclusion: {m.payload.suspected_root_cause}
-                  </div>
-                )}
-                {m.confidence != null && (
-                  <div className="chat-meta">
-                    Confidence: {Math.round(m.confidence * 100)}%
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+    <section className="panel chat-panel">
+      <div className="panel-heading">
+        <div>
+          <h2>NetCoop AI Assistant</h2>
+          <p>Ask questions about your network diagnosis</p>
+        </div>
+        <span className="pipeline-mode">Assistant</span>
       </div>
-    </div>
+
+      <div className="chat-messages">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`chat-message ${
+              message.role === "user" ? "user-message" : "assistant-message"
+            }`}
+          >
+            <span className="chat-role">
+              {message.role === "user" ? "You" : "NetCoop AI"}
+            </span>
+            <p>{message.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <form className="chat-form" onSubmit={handleSend}>
+        <input
+          type="text"
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+          placeholder="Ask about the network diagnosis..."
+        />
+        <button type="submit" disabled={!question.trim()}>
+          Send
+        </button>
+      </form>
+
+      <p className="chat-disclaimer">
+        This assistant currently provides basic report-based responses. It
+        does not perform a new network investigation.
+      </p>
+    </section>
   );
 }
 

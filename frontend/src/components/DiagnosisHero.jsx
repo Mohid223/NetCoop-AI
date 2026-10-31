@@ -1,45 +1,41 @@
-function DiagnosisHero({ report }) {
-  const isInsufficient =
-    report.status === "insufficient_evidence" ||
-    report.status === "insufficient evidence";
+function DiagnosisHero({ report = {} }) {
+  const status = report.status || "waiting";
+  const rootCause =
+    report.suspected_root_cause ||
+    report.root_cause ||
+    "Root cause not determined yet";
+
+  const isInconclusive = status === "insufficient_evidence";
 
   return (
-    <div className="diagnosis-hero">
-      <div className="device-visual">
-        <div className="router-illustration">
-          <div className="router-body">
-            <div className="antenna left"></div>
-            <div className="antenna right"></div>
-            <div className="wifi-waves"></div>
-            <div className="leds">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-          <div className="check-badge">✓</div>
-        </div>
-      </div>
-
-      <div className="diagnosis-content">
-        <div className={`root-cause-card ${isInsufficient ? "warning" : ""}`}>
-          <div className="cause-header">
-            <span className="warning-icon">{isInsufficient ? "⚠️" : "🚨"}</span>
-            <h3>Probable Root Cause</h3>
-          </div>
-          <p>{report.suspected_root_cause || "No root cause identified"}</p>
+    <section className="diagnosis-hero">
+      <div className="hero-content">
+        <div className="hero-eyebrow">
+          <span className="hero-pulse" />
+          NETWORK DIAGNOSIS
         </div>
 
-        <div className="quick-insight">
-          <span className="insight-icon">💡</span>
-          <span>
-            {report.supporting_evidence?.[0]?.interpretation ||
-              "Analysis completed by multi-agent system"}
+        <h1>Network Intelligence Center</h1>
+
+        <p>
+          Monitor network health, investigate incidents, and identify
+          possible root causes using autonomous AI agents.
+        </p>
+
+        <div className="hero-diagnosis">
+          <span className="hero-label">Current assessment</span>
+          <h2>{rootCause}</h2>
+
+          <span
+            className={`diagnosis-status ${
+              isInconclusive ? "warning" : "success"
+            }`}
+          >
+            {status.replaceAll("_", " ").toUpperCase()}
           </span>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

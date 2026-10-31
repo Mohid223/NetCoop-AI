@@ -1,17 +1,26 @@
-function Header() {
+function Header({ backendStatus = "checking" }) {
+  const isOnline = backendStatus === "online";
+
   return (
-    <header className="top-header">
-      <div className="welcome">
-        <h1>
-          Welcome Back, Admin! <span className="wave">👋</span>
-        </h1>
-        <p>Here's your network status at a glance</p>
-      </div>
-      <div className="header-right">
-        <div className="online-chip">
-          <span className="dot"></span> Online
+    <header className="app-header">
+      <div className="header-brand">
+        <div className="brand-logo">N</div>
+        <div>
+          <h2>NetCoop AI</h2>
+          <p>Autonomous Network Intelligence</p>
         </div>
-        <div className="avatar">A</div>
+      </div>
+
+      <div className="header-status">
+        <span className={`status-dot ${isOnline ? "online" : "offline"}`} />
+        <span>
+          Backend:{" "}
+          {backendStatus === "checking"
+            ? "Checking..."
+            : isOnline
+              ? "Connected"
+              : "Disconnected"}
+        </span>
       </div>
     </header>
   );

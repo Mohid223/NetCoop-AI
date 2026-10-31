@@ -1,31 +1,44 @@
+function MetricsRow({ report = {} }) {
+  const confidence = report.confidence ?? 0;
+  const affectedDevices = report.affected_devices?.length ?? 0;
+  const evidence = report.evidence?.length ?? 0;
+  const status = report.status || "No report";
 
-function MetricsRow({ report }) {
-  const confidence = Math.round((report.confidence || 0) * 100);
-  const status = (report.status || "unknown").replace(/_/g, " ").toUpperCase();
+  const metrics = [
+    {
+      label: "Confidence",
+      value: `${Math.round(Number(confidence) * 100)}%`,
+      icon: "◉",
+    },
+    {
+      label: "Affected Devices",
+      value: affectedDevices,
+      icon: "▣",
+    },
+    {
+      label: "Evidence Items",
+      value: evidence,
+      icon: "◈",
+    },
+    {
+      label: "Diagnosis Status",
+      value: status.replaceAll("_", " "),
+      icon: "◎",
+    },
+  ];
 
   return (
-    <div className="metrics-row">
-      {/* Incident ID */}
-      <div className="metric-card center-text">
-        <div className="metric-icon blue"><Link2 size={24} /></div>
-        <span className="metric-label">INCIDENT ID</span>
-        <span className="metric-value big">{report.incident_id || "N/A"}</span>
-      </div>
-
-      {/* Confidence */}
-      <div className="metric-card center-text">
-        <div className="metric-icon green"><ShieldCheck size={24} /></div>
-        <span className="metric-label">CONFIDENCE SCORE</span>
-        <span className="metric-value big text-green">{confidence}% ↗</span>
-      </div>
-
-      {/* Status */}
-      <div className="metric-card center-text">
-        <div className="metric-icon purple"><HeartPulse size={24} /></div>
-        <span className="metric-label">STATUS</span>
-        <span className={`status-badge ${report.status}`}>{status}</span>
-      </div>
-    </div>
+    <section className="metrics-row">
+      {metrics.map((metric) => (
+        <article className="metric-card" key={metric.label}>
+          <div className="metric-top">
+            <span>{metric.label}</span>
+            <span className="metric-icon">{metric.icon}</span>
+          </div>
+          <h2>{metric.value}</h2>
+        </article>
+      ))}
+    </section>
   );
 }
 

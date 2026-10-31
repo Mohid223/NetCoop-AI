@@ -68,29 +68,39 @@ def run_diagnosis(req: RunRequest):
         log.append(m_copy)
 
     return {
-        "incident_id": result["incident_id"],
-        "report": result["report"],
-        "message_log": log,
-    }
-
+    "incident_id": result["incident_id"],
+    "report": result["report"],
+    "autonomous_investigation": result.get("autonomous_investigation"),
+    "message_log": log,
+}
 
 @app.post("/api/run-live")
 def run_live_diagnosis():
-    """Run diagnosis using real network telemetry (ping)."""
+    """Run diagnosis using real network telemetry."""
     try:
         result = run_real_world_diagnosis(target_ip="8.8.8.8")
-        
+
         log = []
-        for m in result.get("message_log", []):
-            m_copy = dict(m)
-            if hasattr(m_copy.get("msg_type"), "value"):
-                m_copy["msg_type"] = m_copy["msg_type"].value
-            log.append(m_copy)
+
+        for message in result.get("message_log", []):
+            message_copy = dict(message)
+
+            if hasattr(message_copy.get("msg_type"), "value"):
+                message_copy["msg_type"] = message_copy["msg_type"].value
+
+            log.append(message_copy)
 
         return {
-            "incident_id": result["incident_id"],
-            "report": result["report"],
+            "incident_id": result.get("incident_id"),
+            "report": result.get("report", {}),
+            "autonomous_investigation": result.get(
+                "autonomous_investigation"
+            ),
             "message_log": log,
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Live diagnosis failed: {str(e)}")
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Live diagnosis failed: {str(error)}"
+        )

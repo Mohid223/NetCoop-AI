@@ -1,28 +1,49 @@
 function AffectedDevices({ devices = [] }) {
+  const deviceList = Array.isArray(devices) ? devices : [];
+
   return (
-    <div className="card affected-devices">
-      <div className="card-header">
-        <h3>Affected Devices</h3>
-        <span className="badge">
-          {devices.length} Device{devices.length !== 1 ? "s" : ""}
-        </span>
+    <section className="panel">
+      <div className="panel-heading">
+        <div>
+          <h2>Affected Devices</h2>
+          <p>Devices identified during network investigation</p>
+        </div>
+        <span className="count-badge">{deviceList.length}</span>
       </div>
 
-      {devices.length > 0 ? (
-        devices.map((device) => (
-          <div key={device} className="device-row">
-            <div className="device-icon">🖥️</div>
-            <div>
-              <div className="device-name">{device}</div>
-              <div className="device-role">Network Device</div>
-            </div>
-            <span className="chevron">›</span>
-          </div>
-        ))
+      {deviceList.length > 0 ? (
+        <div className="device-list">
+          {deviceList.map((device, index) => {
+            const name =
+              typeof device === "string"
+                ? device
+                : device.name || device.hostname || device.device_id || `Device ${index + 1}`;
+
+            const address =
+              typeof device === "object"
+                ? device.ip_address || device.ip || "IP unavailable"
+                : "Device identified";
+
+            return (
+              <div className="device-item" key={index}>
+                <div className="device-icon">▣</div>
+                <div className="device-info">
+                  <strong>{name}</strong>
+                  <span>{address}</span>
+                </div>
+                <span className="device-status">Identified</span>
+              </div>
+            );
+          })}
+        </div>
       ) : (
-        <p className="text-muted">No specific devices identified.</p>
+        <div className="empty-state">
+          <span className="empty-icon">✓</span>
+          <p>No affected devices identified.</p>
+          <small>More telemetry may be required.</small>
+        </div>
       )}
-    </div>
+    </section>
   );
 }
 
