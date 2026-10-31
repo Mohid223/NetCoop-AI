@@ -1,0 +1,48 @@
+{
+  "incident_id": "INC-4411",
+  "status": "diagnosed",
+  "suspected_root_cause": "Weak WiFi signal causing retransmissions",
+  "confidence": 0.96,
+  "affected_devices": [],
+  "supporting_evidence": [
+    {
+      "metric": "latency_ms",
+      "value": 120.0,
+      "interpretation": "latency_ms exceeds 80.0"
+    },
+    {
+      "metric": "jitter_ms",
+      "value": 25.0,
+      "interpretation": "jitter_ms exceeds 15.0"
+    },
+    {
+      "metric": "packet_loss_pct",
+      "value": 4.5,
+      "interpretation": "packet_loss_pct exceeds 2.0"
+    },
+    {
+      "metric": "signal_dbm",
+      "value": -82.0,
+      "interpretation": "Weak WiFi signal (< -75 dBm)"
+    },
+    {
+      "metric": "retransmission_rate_pct",
+      "value": 22.0,
+      "interpretation": "High WiFi retransmissions"
+    }
+  ],
+  "alternative_causes": [
+    "WiFi retransmission storm",
+    "Packet loss due to link instability"
+  ],
+  "recommended_actions": [
+    "Reposition or add access points",
+    "Check for interference and channel overlap"
+  ],
+  "evidence_sources": [
+    "performance_agent",
+    "infrastructure_agent",
+    "connectivity_agent"
+  ],
+  "limitations": []
+}

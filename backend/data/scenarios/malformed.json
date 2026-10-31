@@ -1,0 +1,17 @@
+{
+  "incident_id": "INC-9999",
+  "telemetry": {
+    "latency_ms": "HIGH",
+    "packet_loss_pct": null
+  },
+  "devices": [
+    {
+      "device_id": "BAD_DEV",
+      "status": "down",
+      "cpu_utilization_pct": "N/A"
+    }
+  ],
+  "wifi": {
+    "signal_dbm": "weak"
+  }
+}

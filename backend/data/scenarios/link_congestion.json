@@ -1,0 +1,19 @@
+{
+  "incident_id": "INC-8832",
+  "telemetry": {
+    "latency_ms": 280,
+    "jitter_ms": 45,
+    "packet_loss_pct": 3.2,
+    "link_utilization_pct": 94
+  },
+  "devices": [
+    {
+      "device_id": "HOSTEL_CORE_SW_01",
+      "status": "up",
+      "cpu_utilization_pct": 88,
+      "queue_drops": 160,
+      "interface_errors": 2
+    }
+  ],
+  "wifi": {}
+}

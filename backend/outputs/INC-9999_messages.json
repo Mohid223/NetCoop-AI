@@ -1,0 +1,201 @@
+[
+  {
+    "sender": "orchestrator",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "REQUEST",
+    "incident_id": "INC-9999",
+    "payload": {
+      "expected_agents": 3
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "ed8d14ce-f767-4cf3-8bf8-e69136288668",
+    "timestamp": "2026-10-31T08:23:31.448051+00:00"
+  },
+  {
+    "sender": "orchestrator",
+    "recipient": "performance_agent",
+    "msg_type": "REQUEST",
+    "incident_id": "INC-9999",
+    "payload": {
+      "telemetry": {
+        "latency_ms": "HIGH",
+        "packet_loss_pct": null
+      }
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "ec1c4452-b81d-4acf-82fc-06c50353d332",
+    "timestamp": "2026-10-31T08:23:31.448230+00:00"
+  },
+  {
+    "sender": "performance_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "ERROR",
+    "incident_id": "INC-9999",
+    "payload": {
+      "error": "non-numeric latency_ms='HIGH'"
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "47cf4ac3-cf2b-4a1e-afe2-0260e472587a",
+    "timestamp": "2026-10-31T08:23:31.448305+00:00"
+  },
+  {
+    "sender": "performance_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "FINDING",
+    "incident_id": "INC-9999",
+    "payload": {
+      "agent": "performance_agent",
+      "anomalies": [],
+      "evidence": []
+    },
+    "confidence": 0.1,
+    "units": {},
+    "msg_id": "0e5e7909-45a3-4fdf-8293-020a4e58b18b",
+    "timestamp": "2026-10-31T08:23:31.448349+00:00"
+  },
+  {
+    "sender": "orchestrator",
+    "recipient": "infrastructure_agent",
+    "msg_type": "REQUEST",
+    "incident_id": "INC-9999",
+    "payload": {
+      "devices": [
+        {
+          "device_id": "BAD_DEV",
+          "status": "down",
+          "cpu_utilization_pct": "N/A"
+        }
+      ]
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "f2617dca-44d1-4045-8a5e-348c656b936f",
+    "timestamp": "2026-10-31T08:23:31.448397+00:00"
+  },
+  {
+    "sender": "infrastructure_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "ERROR",
+    "incident_id": "INC-9999",
+    "payload": {
+      "error": "bad cpu_utilization_pct on BAD_DEV: 'N/A'"
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "1c8bb811-4894-48bb-941d-6b0f3a4a8e40",
+    "timestamp": "2026-10-31T08:23:31.448436+00:00"
+  },
+  {
+    "sender": "infrastructure_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "FINDING",
+    "incident_id": "INC-9999",
+    "payload": {
+      "agent": "infrastructure_agent",
+      "anomalies": [
+        "device_down"
+      ],
+      "evidence": [
+        {
+          "device": "BAD_DEV",
+          "metric": "status",
+          "value": "down",
+          "interpretation": "BAD_DEV unreachable"
+        }
+      ],
+      "affected_devices": [
+        "BAD_DEV"
+      ]
+    },
+    "confidence": 0.3333333333333333,
+    "units": {},
+    "msg_id": "84fc0a11-04b1-440b-9f7d-023e5f590bde",
+    "timestamp": "2026-10-31T08:23:31.448474+00:00"
+  },
+  {
+    "sender": "orchestrator",
+    "recipient": "connectivity_agent",
+    "msg_type": "REQUEST",
+    "incident_id": "INC-9999",
+    "payload": {
+      "wifi": {
+        "signal_dbm": "weak"
+      },
+      "devices": [
+        {
+          "device_id": "BAD_DEV",
+          "status": "down",
+          "cpu_utilization_pct": "N/A"
+        }
+      ]
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "c96c50cc-a02b-4258-bd6a-41f32f98bd09",
+    "timestamp": "2026-10-31T08:23:31.448512+00:00"
+  },
+  {
+    "sender": "connectivity_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "ERROR",
+    "incident_id": "INC-9999",
+    "payload": {
+      "error": "bad signal_dbm='weak'"
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "4056a411-054f-474b-a60d-c3c38bae4304",
+    "timestamp": "2026-10-31T08:23:31.448552+00:00"
+  },
+  {
+    "sender": "connectivity_agent",
+    "recipient": "fault_correlation_agent",
+    "msg_type": "FINDING",
+    "incident_id": "INC-9999",
+    "payload": {
+      "agent": "connectivity_agent",
+      "anomalies": [],
+      "evidence": []
+    },
+    "confidence": 0.1,
+    "units": {},
+    "msg_id": "598ae8e1-3e40-44c8-b488-057843105077",
+    "timestamp": "2026-10-31T08:23:31.448575+00:00"
+  },
+  {
+    "sender": "fault_correlation_agent",
+    "recipient": "reporting_agent",
+    "msg_type": "RESULT",
+    "incident_id": "INC-9999",
+    "payload": {
+      "status": "diagnosed",
+      "suspected_root_cause": "Hardware failure / device unreachable",
+      "confidence": 0.99,
+      "affected_devices": [
+        "BAD_DEV"
+      ],
+      "supporting_evidence": [
+        {
+          "device": "BAD_DEV",
+          "metric": "status",
+          "value": "down",
+          "interpretation": "BAD_DEV unreachable"
+        }
+      ],
+      "alternative_causes": [],
+      "evidence_sources": [
+        "performance_agent",
+        "infrastructure_agent",
+        "connectivity_agent"
+      ],
+      "limitations": []
+    },
+    "confidence": null,
+    "units": {},
+    "msg_id": "a8795e86-cd24-4d59-8a3c-72dad3c16c3a",
+    "timestamp": "2026-10-31T08:23:31.448650+00:00"
+  }
+]

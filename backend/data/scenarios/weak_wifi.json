@@ -1,0 +1,20 @@
+{
+  "incident_id": "INC-4411",
+  "telemetry": {
+    "latency_ms": 120,
+    "jitter_ms": 25,
+    "packet_loss_pct": 4.5
+  },
+  "devices": [
+    {
+      "device_id": "HOSTEL_AP_03",
+      "status": "up",
+      "cpu_utilization_pct": 40,
+      "interface_errors": 0
+    }
+  ],
+  "wifi": {
+    "signal_dbm": -82,
+    "retransmission_rate_pct": 22
+  }
+}

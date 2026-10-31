@@ -1,0 +1,28 @@
+{
+  "incident_id": "INC-9999",
+  "status": "diagnosed",
+  "suspected_root_cause": "Hardware failure / device unreachable",
+  "confidence": 0.95,
+  "affected_devices": [
+    "BAD_DEV"
+  ],
+  "supporting_evidence": [
+    {
+      "device": "BAD_DEV",
+      "metric": "status",
+      "value": "down",
+      "interpretation": "BAD_DEV unreachable"
+    }
+  ],
+  "alternative_causes": [],
+  "recommended_actions": [
+    "Verify power and console access",
+    "Dispatch on-site inspection"
+  ],
+  "evidence_sources": [
+    "performance_agent",
+    "infrastructure_agent",
+    "connectivity_agent"
+  ],
+  "limitations": []
+}

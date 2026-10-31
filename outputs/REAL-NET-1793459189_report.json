@@ -1,0 +1,20 @@
+{
+  "incident_id": "REAL-NET-1793459189",
+  "status": "insufficient_evidence",
+  "suspected_root_cause": "Unable to determine",
+  "confidence": 0.0,
+  "affected_devices": [],
+  "supporting_evidence": [],
+  "alternative_causes": [],
+  "recommended_actions": [
+    "Collect additional telemetry before acting"
+  ],
+  "evidence_sources": [
+    "performance_agent",
+    "infrastructure_agent",
+    "connectivity_agent"
+  ],
+  "limitations": [
+    "Not enough correlated anomalies"
+  ]
+}

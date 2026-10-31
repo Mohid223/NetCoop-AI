@@ -1,0 +1,22 @@
+{
+  "incident_id": "REAL-1793471563",
+  "status": "insufficient_evidence",
+  "suspected_root_cause": "Unable to determine root cause with available evidence",
+  "confidence": 0.0,
+  "affected_devices": [],
+  "supporting_evidence": [],
+  "alternative_causes": [],
+  "recommended_actions": [
+    "Collect additional telemetry before taking action",
+    "Verify the diagnosis with network team"
+  ],
+  "evidence_sources": [
+    "performance_agent",
+    "infrastructure_agent",
+    "connectivity_agent"
+  ],
+  "limitations": [
+    "Not enough correlated anomalies from agents",
+    "More telemetry data is required for reliable diagnosis"
+  ]
+}
