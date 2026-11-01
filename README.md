@@ -1,96 +1,121 @@
-# NetCoop AI
+# NetCoop-AI
+### Multi-Agent Intelligent Network Fault Diagnosis System
 
-### Multi-Agent Network Fault Diagnosis System
+**Collaborative Intelligence for Smarter Network Diagnosis**
 
-NetCoop AI is a multi-agent network fault diagnosis platform designed to identify potential network problems by analyzing network performance, infrastructure health, and Wi-Fi connectivity.
+NetCoop-AI is a multi-agent network fault diagnosis platform that identifies potential network problems by analyzing network telemetry, infrastructure health, and connectivity information.
 
-The system uses five specialized agents that communicate through a structured JSON message protocol. Their findings are coordinated by an orchestrator and combined by a rule-based fault correlation agent to generate an explainable diagnostic report with supporting evidence, confidence scores, alternative causes, and recommended actions.
+The system uses five specialized agents coordinated by a central orchestrator. An autonomous investigation engine and fault correlation mechanism analyze evidence, identify likely root causes, estimate confidence, and generate explainable diagnostic reports with alternative causes and recommended corrective actions.
 
-The project includes a **React-based frontend** and a **Python FastAPI backend**.
+NetCoop-AI provides a React-based dashboard powered by a Python FastAPI backend. It supports both scenario-based offline diagnosis and basic live network diagnosis.
 
 ---
 
-## Overview
+## Key Features
 
-Modern campus networks contain multiple interconnected components, including routers, switches, Wi-Fi access points, Ethernet connections, and network devices.
-
-When network problems occur, identifying the actual root cause can be difficult because information is distributed across different sources and may be incomplete, inconsistent, or noisy.
-
-NetCoop AI addresses this challenge through a collaborative multi-agent system. Each agent specializes in a particular area of network diagnosis, exchanges structured findings, and contributes to a unified diagnostic result.
-
-### Key Features
-
-- Five specialized network diagnostic agents.
-- Structured JSON-based inter-agent communication.
-- Centralized orchestration of diagnostic tasks.
-- Rule-based root cause correlation.
-- Evidence-based network diagnosis.
-- Heuristic confidence scoring.
-- Identification of affected devices.
-- Alternative root cause analysis.
-- Recommended troubleshooting actions.
-- Interactive network diagnosis dashboard.
-- Agent communication log visualization.
-- Evidence inspection and raw JSON report viewing.
-- JSON diagnostic report download.
-- Scenario-based and ping-based live diagnosis.
+- **Multi-Agent Architecture:** Five specialized agents collaborate to investigate network faults.
+- **Autonomous Investigation:** Coordinates investigation and analyzes diagnostic findings.
+- **Structured Communication:** Agents exchange information through a custom JSON message protocol.
+- **Network Telemetry Analysis:** Examines latency, jitter, packet loss, and link utilization.
+- **Infrastructure Analysis:** Evaluates device status, CPU, memory, interface errors, and queue drops.
+- **Connectivity Analysis:** Investigates Wi-Fi, DNS, and DHCP-related issues.
+- **Fault Correlation:** Combines evidence to identify likely root causes.
+- **Confidence Scoring:** Provides heuristic confidence estimates.
+- **Causal Analysis:** Uses causal relationships to support diagnosis.
+- **Explainable Reports:** Displays evidence, affected components, alternative causes, and recommendations.
+- **Interactive Dashboard:** Provides diagnosis, evidence, agent communication, and JSON views.
+- **Offline Demo Mode:** Runs predefined network failure scenarios without requiring internet access.
+- **Live Diagnosis Mode:** Performs basic ping-based network diagnosis.
 
 ---
 
 ## System Architecture
 
-```text
-                    USER
-                     |
-                     v
-             REACT FRONTEND
-                     |
-                     | REST API
-                     v
-              FASTAPI BACKEND
-                     |
-                     v
-                ORCHESTRATOR
-                     |
-          +----------+----------+
-          |          |          |
-          v          v          v
-     Performance Infrastructure Connectivity
-        Agent        Agent       Agent
-          |          |          |
-          +----------+----------+
-                     |
-                     v
-              MESSAGE BUS
-                     |
-                     v
-          FAULT CORRELATION AGENT
-                     |
-                     v
-              REPORTING AGENT
-                     |
-                     v
-           DIAGNOSTIC JSON REPORT
-                     |
-                     v
-              REACT DASHBOARD
+```mermaid
+flowchart TD
+    U["User / Network Administrator"]
+    UI["React Dashboard"]
+    API["FastAPI Backend"]
+    INPUT["Scenario JSON / Live Network Data"]
+    ORCH["Multi-Agent Orchestrator"]
+    BUS["Structured Message Bus"]
+
+    subgraph AGENTS["Specialized Diagnostic Agents"]
+        T["Telemetry Agent"]
+        I["Infrastructure Agent"]
+        C["Connectivity Agent"]
+    end
+
+    subgraph INTELLIGENCE["Intelligence Engine"]
+        AI["Autonomous Investigator"]
+        CG["Causal Graph"]
+        FC["Fault Correlation Agent"]
+        CE["Confidence Engine"]
+        RC["Root Cause Engine"]
+        DE["Decision Engine"]
+    end
+
+    RP["Reporting Agent"]
+    OUT["Structured JSON Diagnostic Report"]
+
+    U --> UI
+    UI --> API
+    API --> INPUT
+    INPUT --> ORCH
+    ORCH <--> BUS
+    BUS <--> T
+    BUS <--> I
+    BUS <--> C
+    T --> AI
+    I --> AI
+    C --> AI
+    AI --> CG
+    CG --> FC
+    FC --> CE
+    CE --> RC
+    RC --> DE
+    DE --> RP
+    RP --> OUT
+    OUT --> API
+    API --> UI
 ```
 
-### Backend Agents
+### Architecture Components
+
+| Component | Responsibility |
+|---|---|
+| React Frontend | User interaction and visualization of diagnosis results |
+| FastAPI Backend | REST API and frontend/backend integration |
+| Orchestrator | Coordinates agents and manages the diagnostic workflow |
+| Message Bus | Handles structured communication between agents |
+| Autonomous Investigator | Coordinates investigation and evaluates findings |
+| Causal Graph | Represents relationships between possible network faults and evidence |
+| Confidence Engine | Calculates heuristic confidence scores |
+| Root Cause Engine | Supports root cause identification |
+| Decision Engine | Helps determine the next diagnostic decision |
+| Reporting Agent | Produces the final diagnostic report |
+
+---
+
+## Specialized AI Agents
+
+NetCoop-AI uses five specialized agents.
 
 | Agent | Responsibility |
 |---|---|
-| Performance Agent | Analyzes latency, jitter, packet loss, and link utilization. |
-| Infrastructure Agent | Checks device availability, CPU, memory, queue drops, and interface errors. |
-| Connectivity Agent | Analyzes Wi-Fi signal strength and retransmission rate. |
-| Fault Correlation Agent | Combines findings and identifies likely root causes using predefined rules. |
-| Reporting Agent | Generates the final diagnostic report and recommends troubleshooting actions. |
+| Telemetry Agent | Analyzes network performance metrics such as latency, jitter, packet loss, and utilization. |
+| Infrastructure Agent | Examines device health, CPU, memory, interface errors, and queue drops. |
+| Connectivity Agent | Investigates Wi-Fi signal strength, retransmission, DNS, and DHCP issues. |
+| Fault Correlation Agent | Correlates findings and identifies likely network root causes. |
+| Reporting Agent | Generates structured diagnostic reports and recommended actions. |
+
+The agents are coordinated by the central orchestrator and supported by the autonomous investigation and intelligence modules.
 
 ### Agent Communication Protocol
 
 Agents communicate using a custom structured JSON message protocol.
 
-Each message contains:
+Messages contain fields such as:
 
 - `sender`
 - `recipient`
@@ -104,121 +129,147 @@ Each message contains:
 
 Supported message types:
 
-| Message | Purpose |
+| Message Type | Purpose |
 |---|---|
-| REQUEST | Requests diagnostic analysis from an agent. |
-| FINDING | Shares diagnostic findings. |
-| ERROR | Reports an input or processing error. |
-| RESULT | Shares the correlated diagnostic result. |
+| REQUEST | Requests diagnostic analysis |
+| FINDING | Shares diagnostic findings |
+| ERROR | Reports processing or input errors |
+| RESULT | Shares diagnostic results |
 
-The message schema is defined in `backend/core/schema.py`. Message delivery is handled by the in-memory message bus in `backend/core/message_bus.py`.
+Implementation:
+- Message schema: `backend/core/schema.py`
+- Message bus: `backend/core/message_bus.py`
 
 ---
 
-## Frontend
+## Diagnostic Workflow
 
-The frontend provides an interactive dashboard for running diagnostics and inspecting the results returned by the backend.
+```mermaid
+flowchart TD
+    A["Start Diagnosis"] --> B["Select Diagnosis Mode"]
+    B --> C{"Input Type"}
+    C -->|Offline Demo| D["Load Scenario JSON"]
+    C -->|Live Mode| E["Collect Ping Data"]
+    D --> F["Validate Input"]
+    E --> F
+    F --> G["Initialize Orchestrator"]
+    G --> H["Dispatch Agent Tasks"]
+    H --> I["Telemetry Agent"]
+    H --> J["Infrastructure Agent"]
+    H --> K["Connectivity Agent"]
+    I --> L["Collect Findings"]
+    J --> L
+    K --> L
+    L --> M["Autonomous Investigation"]
+    M --> N["Evidence Correlation"]
+    N --> O["Root Cause Analysis"]
+    O --> P["Confidence Estimation"]
+    P --> Q["Decision and Recommendations"]
+    Q --> R["Reporting Agent"]
+    R --> S["Generate JSON Report"]
+    S --> T["Display Dashboard"]
+```
 
-### Frontend Features
+### Step-by-Step Process
 
-**1. Network Dashboard**
+1. The user selects Offline Demo Mode or Live Investigation Mode.
+2. The frontend sends a request to the FastAPI backend.
+3. The backend validates the input and initializes the orchestrator.
+4. The orchestrator coordinates the specialized diagnostic agents.
+5. Agents analyze their respective network information and share findings through the message bus.
+6. The Autonomous Investigator coordinates the investigation and evaluates the collected findings.
+7. The intelligence modules support evidence correlation, causal analysis, root cause identification, and confidence estimation.
+8. The Reporting Agent generates the final structured diagnostic report.
+9. The frontend displays the diagnosis, supporting evidence, recommendations, and agent communication history.
 
-Displays the NetCoop AI diagnostic interface, system status, and agent pipeline.
+---
 
-**2. Scenario-Based Diagnosis**
+## Supported Diagnostic Scenarios
 
-Allows users to select an available JSON scenario and initiate network fault diagnosis.
+The project includes seven predefined scenarios:
 
-**3. Live Network Diagnosis**
+| Scenario | Description | Expected Diagnosis |
+|---|---|---|
+| `normal.json` | Healthy network conditions | No significant anomaly |
+| `link_congestion.json` | High link utilization and queue drops | Link congestion |
+| `weak_wifi.json` | Weak wireless signal | Wi-Fi connectivity issue |
+| `ethernet_fault.json` | Ethernet/interface-related errors | Interface fault |
+| `dns_failure.json` | DNS resolution problem | DNS failure |
+| `dhcp_failure.json` | DHCP address assignment problem | DHCP failure |
+| `malformed.json` | Incomplete or malformed evidence | Insufficient evidence |
 
-Allows users to run a ping-based diagnostic against the default target configured by the backend.
+The system also validates invalid scenario inputs and handles insufficient diagnostic evidence rather than always claiming a definite root cause.
 
-**4. Diagnostic Results**
+---
 
-Displays the incident ID, confidence score, status, and suspected root cause.
+## Root Cause Analysis
 
-**5. Affected Devices**
+The fault correlation mechanism evaluates diagnostic findings using predefined anomaly rules.
 
-Displays devices identified by the diagnostic agents.
+| Observed Anomaly | Possible Root Cause |
+|---|---|
+| High link utilization | Link congestion |
+| Queue drops | Egress queue congestion |
+| Packet loss | Network instability |
+| High latency | Network congestion or connectivity issue |
+| High jitter | Network instability |
+| Weak Wi-Fi signal | Poor wireless connectivity |
+| High retransmission rate | Wireless retransmission issue |
+| Interface errors | Ethernet/interface fault |
+| Device unavailable | Device failure or unreachable device |
+| DNS resolution failure | DNS configuration or resolver issue |
+| DHCP assignment failure | DHCP service or configuration issue |
 
-**6. Recommended Actions**
+### Confidence Scoring
 
-Shows troubleshooting recommendations generated by the Reporting Agent.
+The system calculates a heuristic confidence score based on the relative scores of competing root cause candidates.
 
-**7. Agent Chat Log**
+**Important:** Confidence scores are heuristic estimates, not statistically calibrated probabilities.
 
-Displays structured messages exchanged between the agents, including findings, errors, and final results.
+When evidence is incomplete or insufficient, the system can return an `insufficient_evidence` status.
 
-**8. Evidence Data**
+---
 
-Displays supporting diagnostic evidence, contributing agents, observed values, and interpretations.
+## Frontend Dashboard
 
-**9. Raw JSON Report**
+The React dashboard provides an interface for running and inspecting network diagnoses.
 
-Displays the structured diagnostic report and provides an option to download it as a JSON file.
+### Dashboard Features
+
+1. **Network Dashboard:** Displays the system interface and agent pipeline.
+2. **Offline Demo Mode:** Selects predefined network failure scenarios.
+3. **Live Investigation Mode:** Runs basic ping-based diagnosis.
+4. **Diagnosis View:** Displays suspected root cause, status, incident ID, and confidence.
+5. **Affected Components:** Shows devices or components identified by the investigation.
+6. **Recommended Actions:** Displays troubleshooting recommendations.
+7. **Agent Communication:** Shows structured messages exchanged between agents.
+8. **Evidence View:** Displays supporting findings and observed metrics.
+9. **JSON Report:** Displays and downloads the diagnostic report.
 
 ### Frontend Technology Stack
 
 | Technology | Purpose |
 |---|---|
 | React 19 | User interface |
-| Vite | Frontend development and build tool |
+| Vite | Development and build tool |
 | JavaScript | Application logic |
-| Axios | HTTP communication with the backend |
-| Lucide React | Icon library |
+| Axios | HTTP communication |
+| Lucide React | Icons |
 | CSS | Dashboard styling |
 
 ---
 
-## Backend
-
-The backend manages the diagnostic workflow, agent communication, fault correlation, and report generation.
-
-### Backend Technology Stack
+## Backend Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Backend programming |
-| FastAPI | REST API development |
-| Pydantic | Request validation |
+| Python | Backend development |
+| FastAPI | REST API framework |
+| Pydantic | Data validation |
 | Uvicorn | ASGI server |
-| JSON | Scenario input and diagnostic output |
-| Custom Message Bus | Inter-agent communication |
-| Rule-Based Engine | Fault correlation |
-
-### Diagnostic Workflow
-
-1. The user selects a scenario or requests a live network diagnosis.
-2. The React frontend sends a request to the FastAPI backend.
-3. The Orchestrator creates or receives an incident ID.
-4. The Performance, Infrastructure, and Connectivity Agents analyze their respective inputs.
-5. Agents publish their findings through the Message Bus.
-6. The Fault Correlation Agent evaluates the findings using predefined rules.
-7. The Reporting Agent generates the final diagnostic report.
-8. The backend returns the report and message log to the frontend.
-9. The frontend displays the diagnosis, evidence, recommendations, and communication history.
-
-### Root Cause Detection
-
-The Fault Correlation Agent uses predefined anomaly rules to identify possible network problems.
-
-| Anomaly | Possible Root Cause |
-|---|---|
-| High link utilization | Link congestion |
-| Queue drops | Egress queue congestion |
-| Packet loss | Link instability |
-| High latency | Possible network congestion |
-| High jitter | Network instability |
-| Weak Wi-Fi signal | Poor wireless connectivity |
-| High retransmission rate | Wi-Fi retransmission storm |
-| Interface errors | Ethernet/interface fault |
-| Device down | Hardware failure or unreachable device |
-| High CPU utilization | Device CPU overload |
-| High memory utilization | Memory pressure |
-
-The confidence score is a heuristic score based on the relative weights of competing root cause candidates. It is not a statistically calibrated probability.
-
-When evidence is insufficient, the system can return an `insufficient_evidence` status rather than claiming a definite root cause.
+| JSON | Scenario and report data |
+| Custom Message Bus | Agent communication |
+| Pytest | Automated testing |
 
 ---
 
@@ -231,59 +282,82 @@ NetCoop-AI/
 │   ├── public/
 │   ├── src/
 │   │   ├── assets/
-│   │   │
 │   │   ├── components/
-│   │   │   ├── Sidebar.jsx
-│   │   │   ├── Header.jsx
-│   │   │   ├── AgentPipeline.jsx
-│   │   │   ├── MetricsRow.jsx
-│   │   │   ├── DiagnosisHero.jsx
-│   │   │   ├── AffectedDevices.jsx
-│   │   │   └── RecommendedActions.jsx
-│   │   │
 │   │   ├── pages/
-│   │   │   ├── DiagnosisTab.jsx
-│   │   │   ├── ChatTab.jsx
-│   │   │   ├── EvidenceTab.jsx
-│   │   │   └── JsonTab.jsx
-│   │   │
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   ├── index.css
 │   │   └── main.jsx
-│   │
-│   ├── index.html
 │   ├── package.json
 │   ├── package-lock.json
 │   └── vite.config.js
 │
 ├── backend/
 │   ├── agents/
-│   │   ├── __init__.py
 │   │   ├── base_agent.py
+│   │   ├── telemetry_agent.py
+│   │   ├── infrastructure_agent.py
 │   │   ├── connectivity_agent.py
 │   │   ├── fault_correlation_agent.py
-│   │   ├── infrastructure_agent.py
-│   │   ├── reporting_agent.py
-│   │   └── telemetry_agent.py
+│   │   └── reporting_agent.py
+│   │
+│   ├── intelligence/
+│   │   ├── autonomous_investigator.py
+│   │   ├── causal_graph.py
+│   │   ├── confidence_engine.py
+│   │   ├── decision_engine.py
+│   │   ├── root_cause_engine.py
+│   │   └── telemetry_normalizer.py
+│   │
+│   ├── diagnostics/
+│   │   ├── bandwidth_test.py
+│   │   ├── diagnostic_runner.py
+│   │   ├── dns_test.py
+│   │   ├── interface_test.py
+│   │   ├── latency_test.py
+│   │   ├── packet_loss_test.py
+│   │   └── ping_test.py
+│   │
+│   ├── remediation/
+│   │   ├── action_planner.py
+│   │   ├── approval_manager.py
+│   │   ├── remediation_executor.py
+│   │   └── rollback_manager.py
+│   │
+│   ├── learning/
+│   │   ├── incident_memory.py
+│   │   ├── pattern_detector.py
+│   │   └── recommendation_engine.py
 │   │
 │   ├── core/
-│   │   ├── __init__.py
 │   │   ├── message_bus.py
 │   │   ├── orchestrator.py
 │   │   └── schema.py
 │   │
 │   ├── data/
 │   │   └── scenarios/
-│   │       └── scenario JSON files
+│   │       ├── normal.json
+│   │       ├── link_congestion.json
+│   │       ├── weak_wifi.json
+│   │       ├── ethernet_fault.json
+│   │       ├── dns_failure.json
+│   │       ├── dhcp_failure.json
+│   │       └── malformed.json
 │   │
-│   ├── outputs/
+│   ├── tests/
+│   │   ├── test_intelligence.py
+│   │   └── test_orchestrator.py
 │   │
-│   ├── __init__.py
 │   ├── api.py
+│   ├── config.py
 │   ├── main.py
-│   └── real_collector.py
+│   ├── real_collector.py
+│   └── requirements.txt
 │
+├── offline_bundle/
+│   └── wheels/
+│
+├── START_NETCOOP.bat
 ├── .gitignore
 └── README.md
 ```
@@ -294,11 +368,9 @@ NetCoop-AI/
 
 ### Prerequisites
 
-Install the following:
-
-- Python 3.10 or later.
-- Node.js and npm.
-- Git.
+- Python 3.10 or later
+- Node.js and npm
+- Git
 
 ### 1. Clone the Repository
 
@@ -309,41 +381,37 @@ cd NetCoop-AI
 
 ### 2. Backend Setup
 
-Create and activate a Python virtual environment:
+Create a virtual environment:
 
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 
-Windows:
+Activate it on Windows PowerShell:
 
-```bash
-venv\Scripts\activate
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
 
 Install backend dependencies:
 
 ```bash
-pip install fastapi uvicorn pydantic
+python -m pip install -r backend/requirements.txt
 ```
 
-Start the FastAPI server from the project root:
+Start the backend from the project root:
 
 ```bash
-uvicorn backend.api:app --reload
+python -m uvicorn backend.api:app --reload
 ```
 
 Backend URL:
 
-```text
-http://127.0.0.1:8000
-```
+`http://127.0.0.1:8000`
 
-API documentation:
+Interactive API documentation:
 
-```text
-http://127.0.0.1:8000/docs
-```
+`http://127.0.0.1:8000/docs`
 
 ### 3. Frontend Setup
 
@@ -351,46 +419,26 @@ Open a second terminal:
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Install Axios, which is used by the current frontend source:
-
-```bash
-npm install axios
-```
-
-Start the frontend development server:
-
-```bash
 npm run dev
 ```
 
-The frontend will be available at the local URL printed by Vite, normally:
+Frontend development URL:
 
-```text
-http://localhost:5173
-```
+`http://localhost:5173`
 
-Keep both the backend and frontend servers running while using the application.
+Keep both development servers running while using the application.
 
 ---
 
 ## API Endpoints
 
-The FastAPI backend exposes the following endpoints:
-
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/health` | Checks backend service status. |
-| GET | `/api/scenarios` | Lists available JSON scenarios. |
-| POST | `/api/run` | Executes scenario-based diagnosis. |
-| POST | `/api/run-live` | Executes ping-based live diagnosis. |
+| GET | `/api/health` | Checks backend availability |
+| GET | `/api/scenarios` | Lists available scenarios |
+| POST | `/api/run` | Runs scenario-based diagnosis |
+| POST | `/api/run-live` | Runs live ping-based diagnosis |
 
 ### Health Check
 
@@ -413,8 +461,6 @@ Example response:
 GET /api/scenarios
 ```
 
-Returns the available JSON scenario filenames.
-
 ### Run Scenario Diagnosis
 
 ```http
@@ -426,15 +472,13 @@ Request:
 
 ```json
 {
-  "scenario_file": "congestion.json"
+  "scenario_file": "link_congestion.json"
 }
 ```
 
-The requested scenario file must exist inside:
+The scenario file must exist inside:
 
-```text
-backend/data/scenarios/
-```
+`backend/data/scenarios/`
 
 ### Run Live Diagnosis
 
@@ -442,130 +486,143 @@ backend/data/scenarios/
 POST /api/run-live
 ```
 
-The current implementation uses `8.8.8.8` as the default ping target.
-
----
-
-## Scenario Input Format
-
-Scenario-based diagnosis uses JSON data containing network telemetry, device information, and Wi-Fi metrics.
-
-Example:
-
-```json
-{
-  "incident_id": "INC-001",
-  "telemetry": {
-    "latency_ms": 120,
-    "jitter_ms": 20,
-    "packet_loss_pct": 3,
-    "link_utilization_pct": 92
-  },
-  "devices": [
-    {
-      "device_id": "SWITCH-01",
-      "status": "up",
-      "cpu_utilization_pct": 45,
-      "memory_utilization_pct": 60,
-      "interface_errors": 2,
-      "queue_drops": 10
-    }
-  ],
-  "wifi": {
-    "signal_dbm": -82,
-    "retransmission_rate_pct": 18
-  }
-}
-```
-
-This is an illustrative input format. The agents use predefined thresholds to identify anomalies.
+The current API uses `8.8.8.8` as its default ping target.
 
 ---
 
 ## Live Network Diagnosis
 
-NetCoop AI includes a basic network collector in:
+The live collector is implemented in:
 
-```text
-backend/real_collector.py
-```
+`backend/real_collector.py`
 
-The collector uses the operating system's ping command to measure:
+The current live diagnosis workflow uses operating-system ping functionality to collect basic network connectivity information, such as:
 
-- Average network latency.
-- Packet loss.
+- Network reachability
+- Average latency
+- Packet loss
 
-The collected ping information is converted into a scenario and passed through the multi-agent diagnostic workflow.
+The collected information is passed into the diagnostic workflow.
 
-**Current limitation:** Jitter is estimated from latency. Link utilization is assigned a placeholder value, while CPU, memory, and other infrastructure metrics are generated as scenario values. These values are not directly collected from routers, switches, or access points through SNMP or another network-management interface.
-
-Therefore, the current live diagnosis is ping-based rather than complete real-time campus network monitoring.
+**Current limitation:** This is a basic ping-based implementation, not complete real-time campus network monitoring. Direct router, switch, and access-point monitoring through SNMP or equivalent infrastructure integrations is not currently implemented. Metrics not directly collected should not be interpreted as verified live measurements.
 
 ---
 
-## Diagnostic Report
+## Offline Deployment
 
-The Reporting Agent generates a unified JSON report with the following fields:
+NetCoop-AI supports local deployment through a production frontend build served by the FastAPI backend.
 
-```json
-{
-  "incident_id": "INC-001",
-  "status": "completed",
-  "suspected_root_cause": "Link congestion causing egress queue drops",
-  "confidence": 0.90,
-  "affected_devices": [],
-  "supporting_evidence": [],
-  "alternative_causes": [],
-  "recommended_actions": [],
-  "evidence_sources": [],
-  "limitations": []
-}
+### Build the Frontend
+
+From the project root:
+
+```powershell
+cd frontend
+npm install
+npm run build
+cd ..
 ```
 
-The example illustrates the report structure; actual values depend on the scenario and agent findings.
+This generates the production frontend files in:
 
-Reports are saved in:
+`frontend/dist/`
 
-```text
-backend/outputs/
+### Start the Application
+
+Run:
+
+```powershell
+python -m uvicorn backend.api:app --host 127.0.0.1 --port 8000
 ```
 
-The frontend also provides a JSON report download option.
+Open:
+
+`http://127.0.0.1:8000`
+
+The backend serves the production frontend when the `frontend/dist` directory is present and mounted.
+
+### Offline Python Dependencies
+
+The project includes an offline wheel bundle under:
+
+`offline_bundle/wheels/`
+
+On a compatible Windows Python environment, dependencies can be installed without internet access:
+
+```powershell
+python -m pip install --no-index --find-links=offline_bundle/wheels -r backend/requirements.txt
+```
+
+**Compatibility note:** The supplied wheel files are platform- and Python-version-specific. The current bundle was prepared for Windows x64 with CPython 3.13. Other operating systems or Python versions may require a separate wheel bundle.
+
+The frontend build must also be generated before offline deployment if it is not already included.
 
 ---
 
-## Current Implementation Notes
+## Testing
 
-- Agent communication currently uses a synchronous in-memory message bus.
+The backend uses Pytest for automated testing.
+
+Run the orchestrator tests:
+
+```bash
+python -m pytest backend/tests/test_orchestrator.py -v
+```
+
+Run the intelligence tests:
+
+```bash
+python -m pytest backend/tests/test_intelligence.py -v
+```
+
+Run all backend tests:
+
+```bash
+python -m pytest backend/tests/ -v
+```
+
+The orchestrator test suite has previously passed with **9 tests**. Run the commands above to verify the latest code version.
+
+---
+
+## Current Implementation Notes and Limitations
+
+- Agent communication currently uses a custom in-memory message bus.
 - Fault correlation uses predefined rules and heuristic scoring.
-- The frontend's agent pipeline animation is a visual progress simulation; it is not a live event stream from the backend.
-- The current correlation workflow expects findings from three diagnostic agents. An agent that returns only an error may prevent the workflow from completing.
-- The current live collector does not directly monitor infrastructure through SNMP.
-- The protocol supports a `units` field, but the current agents do not consistently populate it.
+- Confidence scores are not calibrated probabilities.
+- Live diagnosis currently focuses on ping-based connectivity.
+- Direct SNMP-based infrastructure monitoring is not implemented.
+- The frontend agent pipeline visualization is a presentation of workflow progress, not a live streaming event feed.
+- Remediation recommendations are generated for troubleshooting. Do not assume that every recommendation is automatically executed on real network devices.
+- The offline dependency bundle is specific to its prepared platform and Python version.
+
+---
 
 ## Future Enhancements
 
 - SNMP integration for direct router and switch monitoring.
-- Improved handling of missing, malformed, and incompatible telemetry.
-- Agent failure recovery and more robust orchestration.
-- Improved evidence validation and conflict resolution.
-- Persistent incident history and message storage.
-- Expanded network diagnostic scenarios.
-- Automated interoperability and integration testing.
-- More advanced fault correlation and monitoring capabilities.
+- More advanced network telemetry collection.
+- Improved agent failure recovery and orchestration.
+- Persistent incident history and learning.
+- Advanced causal reasoning and evidence validation.
+- More network failure scenarios.
+- Real-time agent event streaming.
+- Safer automated remediation with approval and rollback.
+- Broader cross-platform offline deployment support.
 
 ---
 
 ## Purpose and Impact
 
-NetCoop AI demonstrates how specialized agents can collaborate to diagnose network faults through structured communication and coordinated analysis.
+NetCoop-AI demonstrates how multiple specialized agents can collaborate to investigate network faults, correlate evidence, and produce explainable diagnostic results.
 
-By combining multiple diagnostic perspectives, the system aims to provide more explainable network troubleshooting, identify likely root causes, highlight uncertainty, and recommend practical corrective actions.
+Instead of relying on a single diagnostic component, the system combines multiple perspectives to help network administrators understand potential failures, identify affected components, evaluate uncertainty, and choose appropriate corrective actions.
 
-**NetCoop AI — Collaborative Intelligence for Smarter Network Diagnosis.**
+**NetCoop-AI — Diagnose. Analyze. Resolve.**
 
 ---
 
 ## Repository
 
-GitHub: https://github.com/Mohid223/NetCoop-AI
+**GitHub:** https://github.com/Mohid223/NetCoop-AI
+
