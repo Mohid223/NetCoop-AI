@@ -1,9 +1,14 @@
 """FastAPI wrapper around the Orchestrator for React frontend."""
 import os
 import json
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 from backend.core.orchestrator import Orchestrator
 from backend.real_collector import run_real_world_diagnosis
@@ -104,3 +109,30 @@ def run_live_diagnosis():
             status_code=500,
             detail=f"Live diagnosis failed: {str(error)}"
         )
+
+FRONTEND_DIST = (
+    Path(__file__).resolve().parent.parent
+    / "frontend"
+    / "dist"
+)
+
+if FRONTEND_DIST.exists():
+    app.mount(
+        "/",
+        StaticFiles(directory=str(FRONTEND_DIST), html=True),
+        name="frontend",
+    )
+
+
+FRONTEND_DIST = (
+    Path(__file__).resolve().parent.parent
+    / "frontend"
+    / "dist"
+)
+
+if FRONTEND_DIST.exists():
+    app.mount(
+        "/",
+        StaticFiles(directory=str(FRONTEND_DIST), html=True),
+        name="frontend",
+    )

@@ -1,6 +1,9 @@
-"""Produces final structured JSON report."""
+
+"""Produces the final structured JSON diagnostic report."""
+
 import json
 import os
+
 from backend.agents.base_agent import BaseAgent
 from backend.core.schema import MsgType
 
@@ -18,16 +21,30 @@ class ReportingAgent(BaseAgent):
             return
 
         payload = message.payload
-        actions = self._recommend(payload.get("suspected_root_cause", ""))
+
+        # Preserve actions from FaultCorrelationAgent.
+        # Use fallback recommendations only if none were provided.
+        actions = payload.get("recommended_actions")
+
+        if not isinstance(actions, list) or not actions:
+            actions = self._recommend(
+                payload.get("suspected_root_cause", "")
+            )
 
         report = {
             "incident_id": message.incident_id,
-            "status": payload.get("status", "diagnosed"),
-            "suspected_root_cause": payload.get("suspected_root_cause", "Unknown"),
+            "status": payload.get("status", "insufficient_evidence"),
+            "suspected_root_cause": payload.get(
+                "suspected_root_cause", "Unknown"
+            ),
             "confidence": payload.get("confidence", 0.0),
             "affected_devices": payload.get("affected_devices", []),
-            "supporting_evidence": payload.get("supporting_evidence", []),
-            "alternative_causes": payload.get("alternative_causes", []),
+            "supporting_evidence": payload.get(
+                "supporting_evidence", []
+            ),
+            "alternative_causes": payload.get(
+                "alternative_causes", []
+            ),
             "recommended_actions": actions,
             "evidence_sources": payload.get("evidence_sources", []),
             "limitations": payload.get("limitations", []),
@@ -36,15 +53,20 @@ class ReportingAgent(BaseAgent):
         self.final_report = report
 
         os.makedirs(self.output_dir, exist_ok=True)
-        path = f"{self.output_dir}/{message.incident_id}_report.json"
-        with open(path, "w") as f:
-            json.dump(report, f, indent=2)
 
-        print("\n" + "="*60)
+        path = os.path.join(
+            self.output_dir,
+            f"{message.incident_id}_report.json"
+        )
+
+        with open(path, "w", encoding="utf-8") as file:
+            json.dump(report, file, indent=2)
+
+        print("\n" + "=" * 60)
         print("FINAL DIAGNOSTIC REPORT")
-        print("="*60)
+        print("=" * 60)
         print(json.dumps(report, indent=2))
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
     def _recommend(self, cause: str):
         table = {

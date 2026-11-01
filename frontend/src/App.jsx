@@ -19,17 +19,50 @@ import "./App.css";
 
 const API_URL = "http://127.0.0.1:8000";
 
+const DEMO_SCENARIOS = [
+  {
+    file: "normal.json",
+    label: "Normal Network",
+  },
+  {
+    file: "dns_failure.json",
+    label: "DNS Failure",
+  },
+  {
+    file: "weak_wifi.json",
+    label: "Weak Wi-Fi Signal",
+  },
+  {
+    file: "link_congestion.json",
+    label: "Link Congestion",
+  },
+];
+
+function getScenarioFile(scenario) {
+  if (typeof scenario === "string") return scenario;
+
+  return (
+    scenario?.file ||
+    scenario?.filename ||
+    scenario?.name ||
+    ""
+  );
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState("diagnosis");
+
+  const [mode, setMode] = useState("offline");
+
   const [scenarios, setScenarios] = useState([]);
-  const [selectedScenario, setSelectedScenario] = useState("");
+  const [selectedScenario, setSelectedScenario] = useState("normal.json");
+
   const [result, setResult] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [backendStatus, setBackendStatus] = useState("checking");
 
-  // Check backend connection
   useEffect(() => {
     checkBackend();
     loadScenarios();
@@ -44,33 +77,33 @@ function App() {
     }
   };
 
-  // Load available scenarios
   const loadScenarios = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/scenarios`);
 
       const data = response.data;
+
       const scenarioList = Array.isArray(data)
         ? data
         : data.scenarios || [];
 
       setScenarios(scenarioList);
 
-      if (scenarioList.length > 0) {
-        const first = scenarioList[0];
+      const normalScenario = scenarioList.find(
+        (item) => getScenarioFile(item) === "normal.json"
+      );
 
-        setSelectedScenario(
-          typeof first === "string"
-            ? first
-            : first.file || first.filename || first.name || ""
-        );
+      if (normalScenario) {
+        setSelectedScenario("normal.json");
+      } else if (scenarioList.length > 0) {
+        setSelectedScenario(getScenarioFile(scenarioList[0]));
       }
     } catch (err) {
       console.error("Scenario loading failed:", err);
+      setError("Unable to load scenarios. Please check the backend.");
     }
   };
 
-  // Common API execution function
   const executeDiagnosis = async (endpoint, payload = {}) => {
     setLoading(true);
     setError("");
@@ -102,7 +135,6 @@ function App() {
     }
   };
 
-  // Run selected scenario
   const runScenario = () => {
     if (!selectedScenario) {
       setError("Please select a network scenario first.");
@@ -114,10 +146,21 @@ function App() {
     });
   };
 
-  // Run autonomous live investigation
   const runLiveDiagnosis = () => {
     executeDiagnosis("/api/run-live");
   };
+
+  const switchMode = (newMode) => {
+    setMode(newMode);
+    setError("");
+    setResult(null);
+  };
+
+  const availableDemoScenarios = DEMO_SCENARIOS.filter((demo) =>
+    scenarios.some(
+      (scenario) => getScenarioFile(scenario) === demo.file
+    )
+  );
 
   const report = result?.report || {};
   const investigation = result?.autonomous_investigation || {};
@@ -146,16 +189,17 @@ function App() {
               <p className="dashboard-eyebrow">
                 NETWORK INTELLIGENCE PLATFORM
               </p>
+
               <h1>NetCoop AI</h1>
+
               <p className="dashboard-description">
                 Autonomous network monitoring, diagnosis and investigation.
               </p>
             </div>
 
             <div className="backend-indicator">
-              <span
-                className={`status-dot ${backendStatus}`}
-              />
+              <span className={`status-dot ${backendStatus}`} />
+
               {backendStatus === "connected"
                 ? "Backend Connected"
                 : backendStatus === "disconnected"
@@ -164,59 +208,104 @@ function App() {
             </div>
           </div>
 
-          {/* Execution Controls */}
+          {/* Demo Mode Selector */}
           <section className="execution-panel">
             <div className="execution-heading">
               <div>
                 <h2>Network Investigation</h2>
                 <p>
-                  Run a predefined scenario or start a live investigation.
+                  Select offline demo mode or live network investigation.
                 </p>
               </div>
             </div>
 
             <div className="execution-controls">
-              <select
-                value={selectedScenario}
-                onChange={(e) => setSelectedScenario(e.target.value)}
+              <button
+                className={mode === "offline" ? "primary-action" : "live-action"}
+                onClick={() => switchMode("offline")}
                 disabled={loading}
               >
-                <option value="">Select a scenario</option>
-
-                {scenarios.map((scenario, index) => {
-                  const value =
-                    typeof scenario === "string"
-                      ? scenario
-                      : scenario.file ||
-                        scenario.filename ||
-                        scenario.name;
-
-                  return (
-                    <option key={index} value={value}>
-                      {typeof scenario === "string"
-                        ? scenario
-                        : scenario.name || value}
-                    </option>
-                  );
-                })}
-              </select>
-
-              <button
-                className="primary-action"
-                onClick={runScenario}
-                disabled={loading || !selectedScenario}
-              >
-                {loading ? "Running..." : "Run Scenario"}
+                Offline Demo Mode
               </button>
 
               <button
-                className="live-action"
-                onClick={runLiveDiagnosis}
+                className={mode === "live" ? "primary-action" : "live-action"}
+                onClick={() => switchMode("live")}
                 disabled={loading}
               >
-                {loading ? "Investigating..." : "Run Live Investigation"}
+                Live Investigation Mode
               </button>
             </div>
+
+            {mode === "offline" ? (
+              <>
+                <div style={{
+                  marginTop: "18px",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  background: "rgba(34, 197, 94, 0.08)",
+                  border: "1px solid rgba(34, 197, 94, 0.25)"
+                }}>
+                  <strong>Offline Demo Mode Active</strong>
+                  <p style={{ margin: "6px 0 0", fontSize: "13px" }}>
+                    Uses locally stored sample scenarios. Internet access is
+                    not required, but the local backend must be running.
+                  </p>
+                </div>
+
+                <div className="execution-controls" style={{ marginTop: "16px" }}>
+                  <select
+                    value={selectedScenario}
+                    onChange={(e) => setSelectedScenario(e.target.value)}
+                    disabled={loading}
+                  >
+                    <option value="">Select a demo scenario</option>
+
+                    {availableDemoScenarios.map((scenario) => (
+                      <option key={scenario.file} value={scenario.file}>
+                        {scenario.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    className="primary-action"
+                    onClick={runScenario}
+                    disabled={
+                      loading ||
+                      !selectedScenario ||
+                      !availableDemoScenarios.some(
+                        (scenario) => scenario.file === selectedScenario
+                      )
+                    }
+                  >
+                    {loading ? "Running..." : "Run Offline Diagnosis"}
+                  </button>
+                </div>
+
+                {availableDemoScenarios.length === 0 && (
+                  <p className="error-message">
+                    No demo scenarios found. Check backend scenario files.
+                  </p>
+                )}
+              </>
+            ) : (
+              <div style={{ marginTop: "16px" }}>
+                <p>
+                  Live mode runs the backend's real-time investigation
+                  endpoint. Network access and suitable permissions may be
+                  required by the diagnostics being executed.
+                </p>
+
+                <button
+                  className="live-action"
+                  onClick={runLiveDiagnosis}
+                  disabled={loading}
+                >
+                  {loading ? "Investigating..." : "Run Live Investigation"}
+                </button>
+              </div>
+            )}
 
             {loading && (
               <div className="loading-message">
@@ -232,7 +321,7 @@ function App() {
             )}
           </section>
 
-          {/* Dashboard metrics */}
+          {/* Dashboard Metrics */}
           {result && (
             <>
               <MetricsRow report={report} />
@@ -279,8 +368,8 @@ function App() {
               <div className="empty-dashboard">
                 <h2>No Investigation Yet</h2>
                 <p>
-                  Run a scenario or start a live investigation to see
-                  network diagnostic results here.
+                  Run an offline scenario or start a live investigation
+                  to see network diagnostic results here.
                 </p>
               </div>
             )}

@@ -1,0 +1,22 @@
+﻿{
+  "incident_id": "INC-DNS-001",
+  "telemetry": {
+    "latency_ms": 25,
+    "jitter_ms": 3,
+    "packet_loss_pct": 0
+  },
+  "devices": [
+    {
+      "device_id": "CAMPUS_DNS_01",
+      "status": "up",
+      "cpu_utilization_pct": 30
+    }
+  ],
+  "wifi": {},
+  "dns": {
+    "status": "failed",
+    "resolution_success": false,
+    "server_reachable": false,
+    "failure_rate_pct": 100
+  }
+}

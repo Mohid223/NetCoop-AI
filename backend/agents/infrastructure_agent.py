@@ -1,4 +1,6 @@
-"""Analyzes device health: CPU, memory, queue drops, interface errors, status."""
+
+"""Analyzes device health and Ethernet/interface faults."""
+
 from backend.agents.base_agent import BaseAgent
 from backend.core.schema import MsgType
 
@@ -11,6 +13,9 @@ class InfrastructureAgent(BaseAgent):
         "memory_utilization_pct": 85.0,
         "queue_drops": 50.0,
         "interface_errors": 10.0,
+        "crc_errors": 10.0,
+        "input_errors": 10.0,
+        "output_errors": 10.0,
     }
 
     def handle(self, message):
@@ -20,12 +25,12 @@ class InfrastructureAgent(BaseAgent):
         devices = message.payload.get("devices", [])
         incident_id = message.incident_id
 
-        if not devices:
+        if not isinstance(devices, list) or not devices:
             self.send(
                 "fault_correlation_agent",
                 MsgType.ERROR,
                 incident_id,
-                {"error": "no device data", "agent": self.name},
+                {"error": "No valid device data", "agent": self.name},
             )
             return
 
@@ -33,54 +38,97 @@ class InfrastructureAgent(BaseAgent):
         evidence = []
         affected = []
 
+        def mark_affected(device_id):
+            if device_id not in affected:
+                affected.append(device_id)
+
         for dev in devices:
             if not isinstance(dev, dict):
                 continue
 
             dev_id = dev.get("device_id", "UNKNOWN")
 
-            # Check status
-            status = str(dev.get("status", "")).lower()
-            if status == "down":
+            # Device availability
+            status = str(dev.get("status", "")).strip().lower()
+
+            if status in ("down", "offline", "unreachable"):
                 findings.append("device_down")
-                if dev_id not in affected:
-                    affected.append(dev_id)
+                mark_affected(dev_id)
                 evidence.append({
                     "device": dev_id,
                     "metric": "status",
-                    "value": "down",
-                    "interpretation": f"{dev_id} is unreachable / down",
+                    "value": status,
+                    "interpretation": f"{dev_id} is down or unreachable",
                 })
 
-            # Check metrics
+            # Ethernet link state
+            link_state = str(
+                dev.get("link_state", dev.get("interface_status", ""))
+            ).strip().lower()
+
+            if link_state in ("down", "failed", "not_connected"):
+                findings.append("interface_errors")
+                mark_affected(dev_id)
+                evidence.append({
+                    "device": dev_id,
+                    "metric": "link_state",
+                    "value": link_state,
+                    "interpretation": f"Ethernet interface on {dev_id} is down",
+                })
+
+            # Device performance and interface counters
             for metric, threshold in self.THRESHOLDS.items():
-                val = dev.get(metric)
-                if val is None:
+                value = dev.get(metric)
+
+                if value is None:
                     continue
 
                 try:
-                    val = float(val)
+                    if isinstance(value, bool):
+                        raise ValueError("Boolean is not a numeric metric")
+                    value = float(value)
+
+                    if value < 0:
+                        raise ValueError("Metric cannot be negative")
+
                 except (TypeError, ValueError):
                     self.send(
                         "fault_correlation_agent",
                         MsgType.ERROR,
                         incident_id,
-                        {"error": f"bad {metric} on {dev_id}: {val!r}"},
+                        {
+                            "error": f"Invalid {metric} on {dev_id}",
+                            "agent": self.name,
+                        },
                     )
                     continue
 
-                if val > threshold:
-                    findings.append(metric)
-                    if dev_id not in affected:
-                        affected.append(dev_id)
+                if value > threshold:
+                    anomaly = (
+                        "interface_errors"
+                        if metric in (
+                            "interface_errors",
+                            "crc_errors",
+                            "input_errors",
+                            "output_errors",
+                        )
+                        else metric
+                    )
+
+                    findings.append(anomaly)
+                    mark_affected(dev_id)
+
                     evidence.append({
                         "device": dev_id,
                         "metric": metric,
-                        "value": val,
-                        "interpretation": f"{metric} is critical on {dev_id} (>{threshold})",
+                        "value": value,
+                        "interpretation": (
+                            f"{metric} exceeds threshold of {threshold} "
+                            f"on {dev_id}"
+                        ),
                     })
 
-        confidence = min(1.0, len(findings) / 3.0) if findings else 0.1
+        confidence = min(1.0, len(set(findings)) / 3.0) if findings else 0.1
 
         self.send(
             recipient="fault_correlation_agent",
@@ -88,7 +136,7 @@ class InfrastructureAgent(BaseAgent):
             incident_id=incident_id,
             payload={
                 "agent": self.name,
-                "anomalies": findings,
+                "anomalies": sorted(set(findings)),
                 "evidence": evidence,
                 "affected_devices": affected,
             },
